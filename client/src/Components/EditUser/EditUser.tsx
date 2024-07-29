@@ -55,6 +55,7 @@ const EditUser = () => {
 			: createUser(values, {
 					onSuccess: (createdUser) => {
 						console.log(createdUser, 'created user');
+						
 
 						updateRQCacheAfterCreate(createdUser, queryClient, USER_QUERY_KEY);
 						navigate(`/userCard/${createdUser._id}`);

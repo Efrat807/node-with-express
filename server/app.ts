@@ -3,6 +3,7 @@ import bodyParser from 'body-parser';
 import router from './routes/items';
 import connectDB from './db';
 import cors from 'cors';
+import { authenticateToken, generateToken } from './controllers/authController';
 
 const app: Application = express();
 const port = 3000;
@@ -54,6 +55,21 @@ app.use(cors(corsOptions));
 // app.options('*', cors());
 
 app.use('/api', router);
+
+// שימוש בפונקציות אלו בנתיבים הרלוונטיים
+app.post('/login', (req, res) => {
+	// בדוק את פרטי המשתמש (לדוגמה, מול מסד נתונים)
+	const { username, password } = req.body;
+	// אם האימות הצליח:
+	const userId = '123'; // לדוגמה, מזהה המשתמש ממסד הנתונים
+	const token = generateToken(userId);
+	res.json({ token });
+});
+
+// דוגמה לנתיב מוגן
+app.get('/protected', authenticateToken, (req: any, res) => {
+	res.json({ message: 'גישה מאושרת', userId: req.user.userId });
+});
 
 app.listen(port, () => {
 	console.log(`Server is running on http://localhost:${port}`);

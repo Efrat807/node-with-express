@@ -7,6 +7,7 @@ const UserSchema = new mongoose_1.Schema({
     email: { type: String, required: true },
     phone: { type: String, required: true },
     image: { type: String },
+    password: { type: String, required: true },
 }, { versionKey: false });
 exports.default = (0, mongoose_1.model)('User', UserSchema);
 // export default Users;

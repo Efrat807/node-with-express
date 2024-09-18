@@ -1,4 +1,3 @@
-import { AxiosRequestConfig } from 'axios';
 import { IUser } from '../Interfaces/IUser';
 import {
 	QueryClient,
@@ -10,19 +9,15 @@ import {
 import { queryClient } from '../../Utils/ReactQueryConfig';
 import { USER_QUERY_KEY } from './QueryKeys';
 import apiClient from '../http-common';
+import { getCurrentUser } from '../../services/authService';
+import { IMutation } from '../../common/Interfaces';
 
 // export const fetchUsers = async (): Promise<IUser[]> => {
 // 	const response = await axios.get<IUser[]>('https://localhost:7196/User');
 // 	return response.data;
 // };
-export type FetchMethod = 'Post' | 'Patch' | 'Put' | 'Delete';
 
-interface IMutation<TData> {
-	path: string;
-	method: FetchMethod;
-	data: TData;
-	headers?: AxiosRequestConfig['headers'];
-}
+
 export const useGetAllUsers = (options?: QueryOptions<IUser[]>) => {
 	const { data: users, ...queryInfo } = useQuery<IUser[]>({
 		queryKey: [USER_QUERY_KEY],
@@ -86,6 +81,16 @@ export const updateRQCacheAfterCreate = <T,>(
 	});
 };
 export const useUser = () => {
+	const user = getCurrentUser();
+	const headers = { Authorization: `Bearer ${user?.token}` }
+	
+	//  const updateUser = useMutation((userData: IUser) =>
+	// 		axios.put(`${API_URL}/users/${userData._id}`, userData, config)
+	// 	);
+
+	// 	const createUser = useMutation((userData: IUser) =>
+	// 		axios.post(`${API_URL}/users`, userData, config)
+	// 	);
 	const { mutate: UpdateUser, ...updateMutateInfo } = useMutation<
 		IUser,
 		unknown,
@@ -108,7 +113,7 @@ export const useUser = () => {
 		options?: UseMutationOptions<IUser, unknown, IMutation<IUser>>
 	) => {
 		CreateUser(
-			{ method: 'Post', path: USER_QUERY_KEY, headers: {}, data },
+			{ method: 'Post', path: USER_QUERY_KEY, headers: headers, data },
 			{
 				onSuccess: (createdUser: IUser) => {
 					updateRQCacheAfterCreate(createdUser, queryClient, USER_QUERY_KEY);
@@ -123,12 +128,12 @@ export const useUser = () => {
 		options?: UseMutationOptions<IUser, unknown, IMutation<IUser>>
 	) => {
 		console.log(data, 'data from client');
-		
+
 		UpdateUser(
 			{
 				method: 'Put',
 				path: `${USER_QUERY_KEY}/${data._id}`,
-				headers: {},
+				headers: headers,
 				data,
 			},
 			{
@@ -152,13 +157,14 @@ export const useUser = () => {
 			{
 				method: 'Delete',
 				path: `${USER_QUERY_KEY}/${id}`,
-				headers: {},
+				headers: headers,
 				data: {
 					firstName: '',
 					lastName: '',
 					email: '',
 					phone: '',
 					image: '',
+					password: '',
 				},
 			},
 			{

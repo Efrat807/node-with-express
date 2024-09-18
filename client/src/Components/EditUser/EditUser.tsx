@@ -3,7 +3,7 @@ import { IUser } from '../../ApiService/Interfaces/IUser';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button, TextField } from '@mui/material';
 import classes from './EditUser.module.scss';
-import { ChangeEvent } from 'react';
+import { ChangeEvent, useEffect } from 'react';
 import {
 	updateRQCacheAfterCreate,
 	updateRQCacheAfterUpdate,
@@ -15,6 +15,7 @@ import { USER_QUERY_KEY } from '../../ApiService/Requests/QueryKeys';
 import { queryClient } from '../../Utils/ReactQueryConfig';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import HomeIcon from '@mui/icons-material/Home';
+import { getCurrentUser, isTokenValid } from '../../services/authService';
 
 const EditUser = () => {
 	const { id } = useParams<{ id: string }>();
@@ -32,10 +33,20 @@ const EditUser = () => {
 					lastName: '',
 					image: '',
 					phone: '',
+					password: '',
 			  }),
 	};
+	useEffect(() => {
+		if (!isTokenValid()) {
+			navigate('/login');
+		}
+	}, [navigate]);
 
 	const onSubmit = (values: IUser) => {
+		const user = getCurrentUser();
+		const config = {
+			headers: { Authorization: `Bearer ${user.token}` },
+		};
 		console.log(values, 'vallllll');
 
 		id
@@ -55,7 +66,6 @@ const EditUser = () => {
 			: createUser(values, {
 					onSuccess: (createdUser) => {
 						console.log(createdUser, 'created user');
-						
 
 						updateRQCacheAfterCreate(createdUser, queryClient, USER_QUERY_KEY);
 						navigate(`/userCard/${createdUser._id}`);
@@ -67,7 +77,7 @@ const EditUser = () => {
 		<div className={classes.userCard}>
 			<div className={classes.title}>
 				<Button onClick={() => navigate('/')}>
-					<HomeIcon style={{color: 'black'}} />
+					<HomeIcon style={{ color: 'black' }} />
 				</Button>
 				<h2 className={classes.titleText}>Edit User</h2>
 				<Button

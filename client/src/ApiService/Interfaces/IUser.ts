@@ -5,5 +5,6 @@ export interface IUser {
 	email: string;
 	phone: string;
 	image?: string;
+	password: string;
 	// domain: string;
 }

@@ -3,7 +3,8 @@ import axios from 'axios';
 
 const apiClient = axios.create({
 	baseURL: 'http://localhost:3000/api/',
-	// baseURL: `${process.env.REACT_APP_SERVER_URL}/`,
+	// baseURL: import.meta.env.VITE_SERVER_URL,
+	// baseURL: `${process.env.VITE_SERVER_URL}/`,
 	withCredentials: true,
 	headers: {
 		'Content-Type': 'application/json',
